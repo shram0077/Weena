@@ -62,6 +62,8 @@ Widget build(BuildContext context) {
   return LayoutBuilder(
     builder: (context, constraints) {
       double screenWidth = constraints.maxWidth;
+      final theme = Theme.of(context);
+      final isDark = theme.brightness == Brightness.dark;
 
       return AppBar(
         leading: widget.user
@@ -82,7 +84,7 @@ Widget build(BuildContext context) {
                 ),
               )
             : IconButton(
-                icon: Icon(Icons.menu, color: Color(0xFF545454)),
+                icon: Icon(Icons.menu, color: theme.iconTheme.color),
                 onPressed: () => Scaffold.of(context).openDrawer(),
               ),
         title: GestureDetector(
@@ -105,12 +107,12 @@ Widget build(BuildContext context) {
               vertical: screenWidth * 0.015,
             ),
             decoration: BoxDecoration(
-              color: const Color(0xFFF2F2F2),
+              color: isDark ? Colors.grey[800] : const Color(0xFFF2F2F2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
               children: [
-                const Icon(CupertinoIcons.search, color: Color(0xFF545454)),
+                Icon(CupertinoIcons.search, color: theme.iconTheme.color),
                 const SizedBox(width: 8),
                 Flexible(
                   child: Text(
@@ -120,8 +122,7 @@ Widget build(BuildContext context) {
                     style: GoogleFonts.barlow(
                       fontSize: screenWidth * 0.047,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF545454),
-                      
+                      color: theme.textTheme.bodyLarge?.color,
                     ),
                   ),
                 ),
@@ -129,7 +130,7 @@ Widget build(BuildContext context) {
             ),
           ),
         ),
-        backgroundColor: whiteColor,
+        backgroundColor: theme.appBarTheme.backgroundColor ?? theme.scaffoldBackgroundColor,
         elevation: 0,
         actions: [
           widget.user
@@ -186,13 +187,12 @@ Widget build(BuildContext context) {
                           padding: const EdgeInsets.all(1.5),
                           decoration: BoxDecoration(
                             color: userModel.profilePicture.isEmpty
-                                ? Colors.white
+                                ? theme.cardColor
                                 : const Color.fromARGB(255, 228, 221, 221),
                             borderRadius: BorderRadius.circular(8),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color.fromARGB(255, 78, 89, 123)
-                                    .withOpacity(0.1),
+                                color: Colors.black.withOpacity(0.05),
                                 spreadRadius: 0.2,
                                 blurRadius: 0.2,
                                 offset: const Offset(0, 1),
@@ -223,4 +223,5 @@ Widget build(BuildContext context) {
       );
     },
   );
-}}
+}
+}

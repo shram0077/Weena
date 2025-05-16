@@ -35,8 +35,8 @@ class _DashboordState extends State<Dashboord> with TickerProviderStateMixin {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   final List<Widget> myTabs = [
-    text("وینەکان", appBarColor, 15, FontWeight.normal, TextDirection.rtl),
-    text("فییدەکان", appBarColor, 15, FontWeight.normal, TextDirection.rtl),
+    text("وینەکان", whiteColor, 15, FontWeight.normal, TextDirection.rtl),
+    text("فییدەکان", whiteColor, 15, FontWeight.normal, TextDirection.rtl),
   ];
 
   TabController? _tabController;
@@ -126,65 +126,83 @@ class _DashboordState extends State<Dashboord> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawerEnableOpenDragGesture: !isGuest,
-      drawer:
-          isGuest
-              ? null
-              : BuildDrawer(
-                version: version,
-                followersCount: _followersCount,
-                followingCount: _followingCount,
-              ),
-      backgroundColor: whiteColor,
-      body: RefreshIndicator(
-        color: const Color.fromARGB(255, 123, 105, 105),
-        backgroundColor: moviePageColor,
-        onRefresh: refreshDatas,
-        child: Padding(
-          padding: const EdgeInsets.only(top: 8.5),
-          child: ListView(
-            shrinkWrap: true,
-            children: [
-              SearchBarr(user: isGuest, currentUserId: _auth.currentUser!.uid),
-              const SizedBox(height: 3),
-              TabBar(
-                controller: _tabController,
-                labelPadding: const EdgeInsets.all(5),
-                labelColor: moviePageColor,
-                indicatorColor: moviePageColor,
-                dividerColor: moviePageColor,
-                unselectedLabelStyle: const TextStyle(color: whiteColor),
-                isScrollable: false,
-                tabs: myTabs,
-                enableFeedback: true,
-                splashBorderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(8),
-                  topRight: Radius.circular(8),
+    return Theme(
+      data: ThemeData.dark().copyWith(
+        scaffoldBackgroundColor: Colors.black,
+        canvasColor: Colors.black,
+        primaryColor: Colors.white,
+        indicatorColor: Colors.white,
+        colorScheme: const ColorScheme.dark().copyWith(
+          primary: Colors.white,
+          secondary: Colors.grey,
+        ),
+        textTheme: ThemeData.dark().textTheme.apply(
+          bodyColor: Colors.white,
+          displayColor: Colors.white,
+        ),
+      ),
+      child: Scaffold(
+        drawerEnableOpenDragGesture: !isGuest,
+        drawer:
+            isGuest
+                ? null
+                : BuildDrawer(
+                  version: version,
+                  followersCount: _followersCount,
+                  followingCount: _followingCount,
                 ),
-                onTap: (index) {
-                  setState(() => _tabController!.animateTo(index));
-                },
-              ),
-              if (_refreshing)
-                const Padding(
-                  padding: EdgeInsets.only(top: 8.0),
-                  child: LinearProgressIndicator(
-                    color: whiteColor,
-                    backgroundColor: moviePageColor,
-                    minHeight: 1.5,
-                  ),
+        backgroundColor: Colors.black, // Override again just to be sure
+        body: RefreshIndicator(
+          color: Colors.white,
+          backgroundColor: Colors.black,
+          onRefresh: refreshDatas,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 8.5),
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                SearchBarr(
+                  user: isGuest,
+                  currentUserId: _auth.currentUser!.uid,
                 ),
-              _tabController!.index == 1
-                  ? BuildFeeds()
-                  : buildWeenas(
-                    context,
-                    tags,
-                    _movies,
-                    _popularityMovies,
-                    widget.currentUserId!,
+                const SizedBox(height: 3),
+                TabBar(
+                  controller: _tabController,
+                  labelPadding: const EdgeInsets.all(5),
+                  labelColor: Colors.white,
+                  indicatorColor: Colors.white,
+                  dividerColor: Colors.white24,
+                  unselectedLabelColor: Colors.white54,
+                  tabs: myTabs,
+                  enableFeedback: true,
+                  splashBorderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(8),
+                    topRight: Radius.circular(8),
                   ),
-            ],
+                  onTap: (index) {
+                    setState(() => _tabController!.animateTo(index));
+                  },
+                ),
+                if (_refreshing)
+                  const Padding(
+                    padding: EdgeInsets.only(top: 8.0),
+                    child: LinearProgressIndicator(
+                      color: Colors.white,
+                      backgroundColor: Colors.grey,
+                      minHeight: 1.5,
+                    ),
+                  ),
+                _tabController!.index == 1
+                    ? BuildFeeds()
+                    : buildWeenas(
+                      context,
+                      tags,
+                      _movies,
+                      _popularityMovies,
+                      widget.currentUserId!,
+                    ),
+              ],
+            ),
           ),
         ),
       ),

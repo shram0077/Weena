@@ -24,14 +24,14 @@ class WelcomeScreen extends StatefulWidget {
   final String? currentUserId;
   final String? visitedUserId;
   final bool isSkiped;
-  const WelcomeScreen(
-      {Key? key,
-      this.userModell,
-      this.activityModel,
-      this.currentUserId,
-      this.visitedUserId,
-      required this.isSkiped})
-      : super(key: key);
+  const WelcomeScreen({
+    Key? key,
+    this.userModell,
+    this.activityModel,
+    this.currentUserId,
+    this.visitedUserId,
+    required this.isSkiped,
+  }) : super(key: key);
   @override
   State<WelcomeScreen> createState() => _WelcomeScreenState();
 }
@@ -72,31 +72,36 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
             widget.isSkiped
-                ? Row(
-                    children: [backButton(context, 20)],
-                  )
+                ? Row(children: [backButton(context, 20)])
                 : const SizedBox(),
             widget.isSkiped
                 ? GestureDetector(
-                    onTap: () async {
-                      var uri = "https://www.weena.app";
-                      if (await canLaunch(uri)) {
-                        await launch(uri);
-                      } else {
-                        throw 'Could not launch $uri';
-                      }
-                    },
-                    child: Text('weena.app',
-                        style: GoogleFonts.barlow(
-                          decoration: TextDecoration.underline,
-                          color: const Color.fromARGB(255, 189, 33, 22),
-                          fontWeight: FontWeight.bold,
-                          fontSize: 26,
-                          letterSpacing: 1,
-                        )),
-                  )
-                : text('Welcome', appBarColor, 30, FontWeight.w500,
-                    TextDirection.rtl),
+                  onTap: () async {
+                    var uri = "https://www.weena.app";
+                    if (await canLaunch(uri)) {
+                      await launch(uri);
+                    } else {
+                      throw 'Could not launch $uri';
+                    }
+                  },
+                  child: Text(
+                    'weena.app',
+                    style: GoogleFonts.barlow(
+                      decoration: TextDecoration.underline,
+                      color: const Color.fromARGB(255, 189, 33, 22),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 26,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                )
+                : text(
+                  'Welcome',
+                  appBarColor,
+                  30,
+                  FontWeight.w500,
+                  TextDirection.rtl,
+                ),
             Lottie.asset(
               'assets/animations/ActionAnim.json',
               height: 190,
@@ -116,12 +121,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Flexible(
-                    child: text(
-                        "گەورەترین خزمەتگوزاری پەخشکردنی فیلم و دراما\n بە بێ بەرامبەر بە ژێرنووسی کوردی.",
-                        appBarColor,
-                        16,
-                        FontWeight.normal,
-                        TextDirection.rtl)),
+                  child: text(
+                    "گەورەترین خزمەتگوزاری پەخشکردنی فیلم و دراما\n بە بێ بەرامبەر بە ژێرنووسی کوردی.",
+                    appBarColor,
+                    16,
+                    FontWeight.normal,
+                    TextDirection.rtl,
+                  ),
+                ),
               ],
             ),
             //  "گەورەترین خزمەتگوزاری پەخشکردنی فیلم و دراما\n بێ بەرامبەر بە ژێرنووسی کوردی. ",
@@ -132,17 +139,25 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   height: 50,
                   onPressed: () {
                     Navigator.push(
-                        context,
-                        PageTransition(
-                            type: PageTransitionType.rightToLeft,
-                            child: const SignIn()));
+                      context,
+                      PageTransition(
+                        type: PageTransitionType.rightToLeft,
+                        child: const SignIn(),
+                      ),
+                    );
                   },
                   color: moviePageColor.withOpacity(0.9),
                   shape: RoundedRectangleBorder(
-                      side: const BorderSide(color: Colors.black),
-                      borderRadius: BorderRadius.circular(10)),
-                  child: text("Sign in", whiteColor, 18, FontWeight.normal,
-                      TextDirection.rtl),
+                    side: const BorderSide(color: Colors.black),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: text(
+                    "Sign in",
+                    whiteColor,
+                    18,
+                    FontWeight.normal,
+                    TextDirection.rtl,
+                  ),
                 ),
                 const SizedBox(height: 10),
                 MaterialButton(
@@ -150,83 +165,98 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   height: 50,
                   onPressed: () {
                     Navigator.push(
-                        context,
-                        PageTransition(
-                            type: PageTransitionType.rightToLeft,
-                            child: const SignUp()));
+                      context,
+                      PageTransition(
+                        type: PageTransitionType.rightToLeft,
+                        child: const SignUp(),
+                      ),
+                    );
                   },
                   color: moviePageColor.withOpacity(0.9),
                   shape: RoundedRectangleBorder(
-                      side: const BorderSide(color: Colors.black),
-                      borderRadius: BorderRadius.circular(10)),
-                  child: text("Sign up", whiteColor, 18, FontWeight.normal,
-                      TextDirection.rtl),
+                    side: const BorderSide(color: Colors.black),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: text(
+                    "Sign up",
+                    whiteColor,
+                    18,
+                    FontWeight.normal,
+                    TextDirection.rtl,
+                  ),
                 ),
               ],
             ),
             widget.isSkiped
                 ? const SizedBox()
                 : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      !_isLoading
-                          ? InkWell(
-                              borderRadius: BorderRadius.circular(10),
-                              splashColor: Colors.white,
-                              onTap: () async {
-                                try {
-                                  setState(() {
-                                    _isLoading = true;
-                                  });
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    !_isLoading
+                        ? InkWell(
+                          borderRadius: BorderRadius.circular(10),
+                          splashColor: Colors.white,
+                          onTap: () async {
+                            try {
+                              setState(() {
+                                _isLoading = true;
+                              });
 
-                                  bool isValid =
-                                      await AuthService.anonymousSignin();
-                                  if (isValid) {
-                                    // ignore: use_build_context_synchronously
-                                    setState(() {
-                                      Navigator.push(
-                                          context,
-                                          PageTransition(
-                                              type: PageTransitionType
-                                                  .rightToLeft,
-                                              child: Feed()));
-                                    });
-                                  } else {
-                                    setState(() {
-                                      _isError = true;
-                                    });
-                                    _isLoading = false;
-                                  }
-                                } catch (e) {
-                                  Fluttertoast.showToast(
-                                      msg: "$e",
-                                      backgroundColor: errorColor,
-                                      textColor: Colors.white);
-                                }
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.all(4.0),
-                                width: 200,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                    color: moviePageColor.withOpacity(0.9),
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(
-                                        color: appBarColor, width: 1)),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  children: [
-                                    text("تێپەڕاندن", whiteColor, 17.5,
-                                        FontWeight.normal, TextDirection.rtl),
-                                  ],
+                              bool isValid =
+                                  await AuthService.anonymousSignin();
+                              if (isValid) {
+                                // ignore: use_build_context_synchronously
+                                setState(() {
+                                  Navigator.push(
+                                    context,
+                                    PageTransition(
+                                      type: PageTransitionType.rightToLeft,
+                                      child: Feed(),
+                                    ),
+                                  );
+                                });
+                              } else {
+                                setState(() {
+                                  _isError = true;
+                                });
+                                _isLoading = false;
+                              }
+                            } catch (e) {
+                              Fluttertoast.showToast(
+                                msg: "$e",
+                                backgroundColor: errorColor,
+                                textColor: Colors.white,
+                              );
+                            }
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(4.0),
+                            width: 200,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: moviePageColor.withOpacity(0.9),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: appBarColor, width: 1),
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                text(
+                                  "تێپەڕاندن",
+                                  whiteColor,
+                                  17.5,
+                                  FontWeight.normal,
+                                  TextDirection.rtl,
                                 ),
-                              ))
-                          : CircleProgressIndicator()
-                    ],
-                  ),
+                              ],
+                            ),
+                          ),
+                        )
+                        : CircleProgressIndicator(),
+                  ],
+                ),
             GestureDetector(
               onTap: () async {
                 var url = privacyPolicyUri;
@@ -242,11 +272,17 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 decoration: ShapeDecoration(
                   color: Color(0x70ECECEC),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(9)),
+                    borderRadius: BorderRadius.circular(9),
+                  ),
                 ),
                 child: Center(
-                  child: text('سیاسەتی بەکارهێنان', appBarColor, 15,
-                      FontWeight.normal, TextDirection.rtl),
+                  child: text(
+                    'سیاسەتی بەکارهێنان',
+                    appBarColor,
+                    15,
+                    FontWeight.normal,
+                    TextDirection.rtl,
+                  ),
                 ),
               ),
             ),

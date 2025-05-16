@@ -6,7 +6,7 @@ import 'package:weena_latest/Models/ActivityModel.dart';
 import 'package:weena_latest/Models/userModel.dart';
 import 'package:weena_latest/Screens/Activites/activites.dart';
 import 'package:weena_latest/Screens/Chats/ListUsers.dart';
-import 'package:weena_latest/Screens/Home/Dashbord.dart';
+import 'package:weena_latest/Screens/Home/Dashboard/Dashbord.dart';
 import 'package:weena_latest/Screens/Search/search.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

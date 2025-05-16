@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:unity_ads_plugin/unity_ads_plugin.dart';
 import 'package:weena_latest/Constant/constant.dart';
-import 'package:weena_latest/Screens/MoviePage/VideoPlayer.dart';
+import 'package:weena_latest/Screens/MoviePage/Video_Player/VideoPlayer.dart';
 
 class AdManager {
   static Future<void> loadUnityAd(plcID) async {

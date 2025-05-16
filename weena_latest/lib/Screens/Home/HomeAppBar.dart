@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:weena_latest/Constant/constant.dart';
@@ -56,191 +57,170 @@ class _SearchBarrState extends State<SearchBarr> with WidgetsBindingObserver {
       print("Go Offline");
     }
   }
+@override
+Widget build(BuildContext context) {
+  return LayoutBuilder(
+    builder: (context, constraints) {
+      double screenWidth = constraints.maxWidth;
 
-  @override
-  Widget build(BuildContext context) {
-    return AppBar(
-      leading:
-          widget.user
-              ? GestureDetector(
+      return AppBar(
+        leading: widget.user
+            ? GestureDetector(
                 onTap: () async {
                   var url = "https://www.facebook.com/weenakrd";
                   if (await canLaunch(url)) {
                     await launch(url);
-                  } else {
-                    print('Could not launch $url');
                   }
                 },
                 child: Padding(
                   padding: const EdgeInsets.only(left: 10.0, top: 6, bottom: 6),
                   child: Lottie.asset(
                     'assets/animations/ActionAnim.json',
-                    height: 25,
-                    width: 25,
+                    height: screenWidth * 0.06,
+                    width: screenWidth * 0.06,
                   ),
                 ),
               )
-              : IconButton(
+            : IconButton(
                 icon: Icon(Icons.menu, color: Color(0xFF545454)),
                 onPressed: () => Scaffold.of(context).openDrawer(),
               ),
-      title: GestureDetector(
-        onTap: () {
-          Navigator.push(
-            context,
-            PageTransition(
-              type: PageTransitionType.rightToLeft,
-              child: SearchSC(
-                fromDashdboard: true,
-                currentUserId: widget.currentUserId,
-                fromDashdboardTags: "",
-              ),
-            ),
-          );
-        },
-        child: Container(
-          padding: EdgeInsets.all(9),
-          decoration: BoxDecoration(
-            color: Color(0xFFF2F2F2),
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Icon(CupertinoIcons.search, color: Color(0xFF545454)),
-              text(
-                "Search Movies,Dramas,Users",
-                Color(0xFF545454),
-                14,
-                FontWeight.w400,
-                TextDirection.rtl,
-              ),
-            ],
-          ),
-        ),
-      ),
-      backgroundColor: whiteColor,
-      elevation: 0,
-      actions: [
-        widget.user
-            ?
-            // If user is Anonymous
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  PageTransition(
-                    type: PageTransitionType.topToBottom,
-                    child: WelcomeScreen(
-                      isSkiped: true,
-                      activityModel: widget.activityModel,
-                      currentUserId: widget.currentUserId,
-                      userModell: widget.userModel,
-                      visitedUserId: widget.visitedUserId,
-                    ),
-                  ),
-                );
-              },
-              child: const Padding(
-                padding: EdgeInsets.all(5.0),
-                child: CircleAvatar(
-                  backgroundColor: Color.fromARGB(255, 228, 221, 221),
-                  backgroundImage: AssetImage('assets/images/person.png'),
+        title: GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              PageTransition(
+                type: PageTransitionType.rightToLeft,
+                child: SearchSC(
+                  fromDashdboard: true,
+                  currentUserId: widget.currentUserId,
+                  fromDashdboardTags: "",
                 ),
               ),
-            )
-            : StreamBuilder(
-              stream: usersRef.doc(widget.currentUserId).snapshots(),
-              builder: (BuildContext context, AsyncSnapshot snapshot) {
-                if (!snapshot.hasData) {
-                  return Center(child: loadingProfileContiner());
-                } else if (snapshot == ConnectionState.waiting) {
-                  return Center(child: loadingProfileContiner());
-                }
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Snapshot Error',
-                          style: GoogleFonts.alef(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
-                            color: errorColor,
-                          ),
-                        ),
-                      ],
+            );
+          },
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: screenWidth * 0.025,
+              vertical: screenWidth * 0.015,
+            ),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF2F2F2),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                const Icon(CupertinoIcons.search, color: Color(0xFF545454)),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    "Search Movies,Dramas,Users".tr,
+                    overflow: TextOverflow.ellipsis,
+                    textDirection: TextDirection.rtl,
+                    style: GoogleFonts.barlow(
+                      fontSize: screenWidth * 0.047,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF545454),
+                      
                     ),
-                  );
-                }
-                UserModell userModel = UserModell.fromDoc(snapshot.data);
-                return GestureDetector(
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        backgroundColor: whiteColor,
+        elevation: 0,
+        actions: [
+          widget.user
+              ? GestureDetector(
                   onTap: () {
                     Navigator.push(
                       context,
                       PageTransition(
                         type: PageTransitionType.topToBottom,
-                        child: ProfileScreen(
+                        child: WelcomeScreen(
+                          isSkiped: true,
+                          activityModel: widget.activityModel,
                           currentUserId: widget.currentUserId,
-                          userModel: userModel,
-                          visitedUserId: userModel.id,
+                          userModell: widget.userModel,
+                          visitedUserId: widget.visitedUserId,
                         ),
                       ),
                     );
                   },
-                  child: Padding(
-                    padding: const EdgeInsets.all(6.0),
-                    child: Container(
-                      padding: const EdgeInsets.all(1.5),
-                      height: 50,
-                      width: 50,
-                      decoration: BoxDecoration(
-                        color:
-                        userModel.profilePicture.isEmpty?Colors.white:
-                         Color.fromARGB(255, 228, 221, 221),
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color.fromARGB(
-                              255,
-                              78,
-                              89,
-                              123,
-                            ).withOpacity(0.1),
-                            spreadRadius: 0.2,
-                            blurRadius: 0.2,
-                            offset: const Offset(0, 1),
-                          ),
-                        ],
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child:
-                            userModel.profilePicture.isEmpty
-                                ? Image.asset(
-                                  "assets/images/person.png",
-                                  fit: BoxFit.contain,
-                                  width: 45,
-                                  height: 45,
-                                )
-                                : CachedNetworkImage(
-                                  imageUrl:
-                                      MyEncriptionDecription.decryptWithAESKey(
-                                        userModel.profilePicture,
-                                      ),
-                                  fit: BoxFit.cover,
-                                  width: 45,
-                                  height: 45,
-                                ),
-                      ),
+                  child: const Padding(
+                    padding: EdgeInsets.all(5.0),
+                    child: CircleAvatar(
+                      backgroundColor: Color.fromARGB(255, 228, 221, 221),
+                      backgroundImage: AssetImage('assets/images/person.png'),
                     ),
                   ),
-                );
-              },
-            ),
-      ],
-      automaticallyImplyLeading: false,
-    );
-  }
-}
+                )
+              : StreamBuilder(
+                  stream: usersRef.doc(widget.currentUserId).snapshots(),
+                  builder: (context, AsyncSnapshot snapshot) {
+                    if (!snapshot.hasData) return loadingProfileContiner();
+                    if (snapshot.hasError) return Text("Error loading profile");
+                    UserModell userModel = UserModell.fromDoc(snapshot.data);
+
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          PageTransition(
+                            type: PageTransitionType.topToBottom,
+                            child: ProfileScreen(
+                              currentUserId: widget.currentUserId,
+                              userModel: userModel,
+                              visitedUserId: userModel.id,
+                            ),
+                          ),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(6.0),
+                        child: Container(
+                          height: screenWidth * 0.12,
+                          width: screenWidth * 0.12,
+                          padding: const EdgeInsets.all(1.5),
+                          decoration: BoxDecoration(
+                            color: userModel.profilePicture.isEmpty
+                                ? Colors.white
+                                : const Color.fromARGB(255, 228, 221, 221),
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color.fromARGB(255, 78, 89, 123)
+                                    .withOpacity(0.1),
+                                spreadRadius: 0.2,
+                                blurRadius: 0.2,
+                                offset: const Offset(0, 1),
+                              ),
+                            ],
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: userModel.profilePicture.isEmpty
+                                ? Image.asset(
+                                    "assets/images/person.png",
+                                    fit: BoxFit.contain,
+                                  )
+                                : CachedNetworkImage(
+                                    imageUrl: MyEncriptionDecription
+                                        .decryptWithAESKey(
+                                            userModel.profilePicture),
+                                    fit: BoxFit.cover,
+                                  ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+        ],
+        automaticallyImplyLeading: false,
+      );
+    },
+  );
+}}

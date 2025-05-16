@@ -36,13 +36,12 @@ final blockedRef = _fireStore.collection('blocked');
 final likesRef = _fireStore.collection('likes');
 final reefeedsRef = _fireStore.collection('reefeeds');
 final requestsRef = _fireStore.collection('requests');
-final explorersRef = _fireStore.collection('explorers');
-final newMoviesRef = _fireStore.collection("newMovie's");
 final postsRef = _fireStore.collection('posts');
 final followingPostsRef = _fireStore.collection('followingPost');
-final recommendedRef = _fireStore.collection("recommended");
 final linksRef = _fireStore.collection('links');
 final viewsRef = _fireStore.collection('views');
+final moviesRef = _fireStore.collection('Movies');
+
 final commentsRef = _fireStore.collection('comments');
 final seriesRef = _fireStore.collection('series');
 final movieReportsRef = _fireStore.collection('movieReports');
@@ -81,7 +80,7 @@ final tags = [
   'مێژووی',
   'جەنگ',
   'بەڵگەنامەی',
-  '‌عەرەبی'
+  '‌عەرەبی',
 ];
 
 final String androidUitId = "5348869";

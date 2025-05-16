@@ -29,27 +29,35 @@ class DatabaseServices {
         .doc(postModel.userId)
         .collection('userPosts')
         .doc(postModel.postuid)
-        .update({'views': FieldValue.increment(1)}).then((value) => newMoviesRef
-            .doc(postModel.postuid)
-            .update({'views': FieldValue.increment(1)}).then((value) =>
-                recommendedRef
-                    .doc(postModel.postuid)
-                    .update({'views': FieldValue.increment(1)})));
+        .update({'views': FieldValue.increment(1)})
+        .then(
+          (value) => moviesRef
+              .doc(postModel.postuid)
+              .update({'views': FieldValue.increment(1)})
+              .then(
+                (value) => moviesRef.doc(postModel.postuid).update({
+                  'views': FieldValue.increment(1),
+                }),
+              ),
+        );
     print('View has been sent');
   }
 
   // Set to History
   static void setToHistory(
-      PostModel postModel, String currentUserId, String ownerId) async {
+    PostModel postModel,
+    String currentUserId,
+    String ownerId,
+  ) async {
     await historyViews
         .doc(currentUserId)
         .collection("Viewed")
         .doc(postModel.id)
         .set({
-      "postuid": postModel.postuid,
-      "Timestamp": Timestamp.now(),
-      "OwnerId": ownerId
-    });
+          "postuid": postModel.postuid,
+          "Timestamp": Timestamp.now(),
+          "OwnerId": ownerId,
+        });
   }
 
   // Get Views
@@ -75,57 +83,60 @@ class DatabaseServices {
 
   // Update User Display Nname
   static void updateUserDisplayName(UserModell user) {
-    usersRef.doc(user.id).update({
-      'name': user.name,
-    });
+    usersRef.doc(user.id).update({'name': user.name});
   }
 
   // Update links
   static void updateLinks(String userId, LinksModel linksModel, ctx) {
-    linksRef.doc(userId).update(
-      {
-        "Facebook": linksModel.facebook,
-        "Instagram": linksModel.instagram,
-        "YouTube": linksModel.youtube
-      },
-    ).whenComplete(() {
-      Fluttertoast.showToast(
-          msg: 'خەزنکرا', backgroundColor: appcolor, textColor: Colors.white);
-      Navigator.pop(ctx);
-    });
+    linksRef
+        .doc(userId)
+        .update({
+          "Facebook": linksModel.facebook,
+          "Instagram": linksModel.instagram,
+          "YouTube": linksModel.youtube,
+        })
+        .whenComplete(() {
+          Fluttertoast.showToast(
+            msg: 'خەزنکرا',
+            backgroundColor: appcolor,
+            textColor: Colors.white,
+          );
+          Navigator.pop(ctx);
+        });
   }
 
   // Update Country or city
   static void updateCountryorCity(UserModell userModell) {
-    usersRef.doc(userModell.id).update(
-        {'country': userModell.country, 'cityorTown': userModell.cityorTown});
+    usersRef.doc(userModell.id).update({
+      'country': userModell.country,
+      'cityorTown': userModell.cityorTown,
+    });
     print("Result : ${userModell.country}");
   }
 
-// Update About User
+  // Update About User
   static void updateAboutUser(UserModell user) {
-    usersRef.doc(user.id).update({
-      'bio': user.bio,
-    });
+    usersRef.doc(user.id).update({'bio': user.bio});
   }
 
   static void uploadVideo(
-      String title,
-      String description,
-      String uuid,
-      String videoLink,
-      String thumbnailLink,
-      String type,
-      String currentUserId,
-      int episode,
-      int series,
-      context,
-      double imdbRating,
-      int likes,
-      int views,
-      String userid,
-      List tags,
-      String trailer) {
+    String title,
+    String description,
+    String uuid,
+    String videoLink,
+    String thumbnailLink,
+    String type,
+    String currentUserId,
+    int episode,
+    int series,
+    context,
+    double imdbRating,
+    int likes,
+    int views,
+    String userid,
+    List tags,
+    String trailer,
+  ) {
     postsRef
         .doc(currentUserId)
         .collection('userPosts')
@@ -146,13 +157,14 @@ class DatabaseServices {
           "trailer": trailer,
           "imdbRating": imdbRating,
           "likes": likes,
-          "views": views
+          "views": views,
         })
         .then((doc) async {
-          QuerySnapshot followerSnapshot = await followersRef
-              .doc(currentUserId)
-              .collection('Followers')
-              .get();
+          QuerySnapshot followerSnapshot =
+              await followersRef
+                  .doc(currentUserId)
+                  .collection('Followers')
+                  .get();
 
           for (var docSnapshot in followerSnapshot.docs) {
             followingPostsRef
@@ -160,45 +172,51 @@ class DatabaseServices {
                 .collection('posts')
                 .doc(uuid)
                 .set({
-              "description": description,
-              "video": videoLink,
-              "Timestamp": Timestamp.now(),
-              "postuid": uuid,
-              "title": title,
-              "type": type,
-              "userId": userid,
-              "verified": false,
-              'thumbnail': thumbnailLink,
-              "episode": episode,
-              'series': series,
-              "tags": tags,
-              "trailer": trailer,
-              "imdbRating": imdbRating,
-              "likes": likes,
-              "views": views
-            });
+                  "description": description,
+                  "video": videoLink,
+                  "Timestamp": Timestamp.now(),
+                  "postuid": uuid,
+                  "title": title,
+                  "type": type,
+                  "userId": userid,
+                  "verified": false,
+                  'thumbnail': thumbnailLink,
+                  "episode": episode,
+                  'series': series,
+                  "tags": tags,
+                  "trailer": trailer,
+                  "imdbRating": imdbRating,
+                  "likes": likes,
+                  "views": views,
+                });
           }
         })
-        .whenComplete(() => newMoviesRef.doc(uuid).set({
-              "description": description,
-              "video": videoLink,
-              "Timestamp": Timestamp.now(),
-              "postuid": uuid,
-              "title": title,
-              "type": type,
-              "userId": userid,
-              "verified": false,
-              'thumbnail': thumbnailLink,
-              "episode": episode,
-              'series': series,
-              "tags": tags,
-              "trailer": trailer,
-              "imdbRating": imdbRating,
-              "likes": likes,
-              "views": views
-            }))
-        .whenComplete(() =>
-            Fluttertoast.showToast(msg: 'succs', backgroundColor: Colors.green))
+        .whenComplete(
+          () => moviesRef.doc(uuid).set({
+            "description": description,
+            "video": videoLink,
+            "Timestamp": Timestamp.now(),
+            "postuid": uuid,
+            "title": title,
+            "type": type,
+            "userId": userid,
+            "verified": false,
+            'thumbnail': thumbnailLink,
+            "episode": episode,
+            'series': series,
+            "tags": tags,
+            "trailer": trailer,
+            "imdbRating": imdbRating,
+            "likes": likes,
+            "views": views,
+          }),
+        )
+        .whenComplete(
+          () => Fluttertoast.showToast(
+            msg: 'succs',
+            backgroundColor: Colors.green,
+          ),
+        )
         .then((value) => Navigator.pop(context));
   }
 
@@ -206,24 +224,31 @@ class DatabaseServices {
     commentsRef.doc(postModel.postuid).set({"likes": currentUserId});
   }
 
-// Add comment
-  static void addComment(PostModel postModel, String currentUserId,
-      String commentText, bool author, ctx, rating) async {
+  // Add comment
+  static void addComment(
+    PostModel postModel,
+    String currentUserId,
+    String commentText,
+    bool author,
+    ctx,
+    rating,
+  ) async {
     commentsRef
         .doc(postModel.postuid)
         .collection('Comments')
         .doc(currentUserId)
         .set({
-      'Timestamp': Timestamp.now(),
-      "postuid": postModel.postuid,
-      'commentText': commentText,
-      'rating': rating,
-      'byUserId': currentUserId,
-      "author": author
-    }).whenComplete(() => Navigator.pop(ctx));
+          'Timestamp': Timestamp.now(),
+          "postuid": postModel.postuid,
+          'commentText': commentText,
+          'rating': rating,
+          'byUserId': currentUserId,
+          "author": author,
+        })
+        .whenComplete(() => Navigator.pop(ctx));
   }
 
-// setupIsMovieOnPlus18
+  // setupIsMovieOnPlus18
   static Future<bool> setupIsMovieOnPlus18(String movieId) async {
     DocumentSnapshot movieDoc = await plus18Ref.doc(movieId).get();
     return movieDoc.exists;
@@ -231,18 +256,19 @@ class DatabaseServices {
 
   // Get Comments
   static Future<List<CommentModel>> getComments(PostModel postModel) async {
-    QuerySnapshot commentsSnap = await commentsRef
-        .doc(postModel.postuid)
-        .collection('Comments')
-        .orderBy('rating', descending: true)
-        .get();
+    QuerySnapshot commentsSnap =
+        await commentsRef
+            .doc(postModel.postuid)
+            .collection('Comments')
+            .orderBy('rating', descending: true)
+            .get();
     List<CommentModel> userComment =
         commentsSnap.docs.map((doc) => CommentModel.fromDoc(doc)).toList();
 
     return userComment;
   }
 
-// Delete Likes OF Posts
+  // Delete Likes OF Posts
   static void deleteLikesOfPosts(postuid) async {
     await FirebaseFirestore.instance
         .collection('likes')
@@ -250,11 +276,11 @@ class DatabaseServices {
         .collection("Likes")
         .get()
         .then((snapshot) {
-      for (DocumentSnapshot ds in snapshot.docs) {
-        print("Deleting Likes.... {${ds.reference.id}}");
-        ds.reference.delete();
-      }
-    });
+          for (DocumentSnapshot ds in snapshot.docs) {
+            print("Deleting Likes.... {${ds.reference.id}}");
+            ds.reference.delete();
+          }
+        });
   }
 
   // Delete Reefeds OF Feed
@@ -265,19 +291,21 @@ class DatabaseServices {
         .collection("Reefeeds")
         .get()
         .then((snapshot) {
-      for (DocumentSnapshot ds in snapshot.docs) {
-        print("Deleting Reefeds .... {${ds.reference.id}}");
-        ds.reference.delete();
-      }
-    });
+          for (DocumentSnapshot ds in snapshot.docs) {
+            print("Deleting Reefeds .... {${ds.reference.id}}");
+            ds.reference.delete();
+          }
+        });
   }
 
-// delete post
+  // delete post
   static void deletePost(PostModel postModel, context) async {
-    final videoStorage = storageRef
-        .child("video's/${postModel.title}, ${postModel.postuid}.mp4");
-    final thumbnailStorage = storageRef
-        .child("thumbnail's/${postModel.title}, ${postModel.postuid}.jpg");
+    final videoStorage = storageRef.child(
+      "video's/${postModel.title}, ${postModel.postuid}.mp4",
+    );
+    final thumbnailStorage = storageRef.child(
+      "thumbnail's/${postModel.title}, ${postModel.postuid}.jpg",
+    );
     likesRef.doc(postModel.postuid).delete();
     reefeedsRef.doc(postModel.postuid).delete();
     // Delete Likes of Post
@@ -288,52 +316,58 @@ class DatabaseServices {
           .collection('userPosts')
           .doc(postModel.id)
           .delete()
-          .then((value) => newMoviesRef.doc(postModel.id).delete())
+          .then((value) => moviesRef.doc(postModel.id).delete())
           .then((value) {
-        explorersRef.doc(postModel.postuid).delete();
-        recommendedRef.doc(postModel.postuid).delete();
-        likesRef.doc(postModel.postuid).delete();
-        viewsRef.doc(postModel.postuid).delete();
-      }).then((doc) async {
-        QuerySnapshot followerSnapshot = await followersRef
-            .doc(postModel.userId)
-            .collection('Followers')
-            .get();
-        for (var docSnapshot in followerSnapshot.docs) {
-          await followingPostsRef
-              .doc(docSnapshot.id)
-              .collection('posts')
-              .doc(postModel.id)
-              .delete()
-              .whenComplete(() {
-            videoStorage.delete();
-            thumbnailStorage.delete();
+            moviesRef.doc(postModel.postuid).delete();
+            moviesRef.doc(postModel.postuid).delete();
+            likesRef.doc(postModel.postuid).delete();
+            viewsRef.doc(postModel.postuid).delete();
+          })
+          .then((doc) async {
+            QuerySnapshot followerSnapshot =
+                await followersRef
+                    .doc(postModel.userId)
+                    .collection('Followers')
+                    .get();
+            for (var docSnapshot in followerSnapshot.docs) {
+              await followingPostsRef
+                  .doc(docSnapshot.id)
+                  .collection('posts')
+                  .doc(postModel.id)
+                  .delete()
+                  .whenComplete(() {
+                    videoStorage.delete();
+                    thumbnailStorage.delete();
+                  });
+            }
           });
-        }
-      });
 
       getUserPosts(postModel.userId);
       Navigator.pop(context);
     } catch (e) {
       Fluttertoast.showToast(
-          msg: "$e", backgroundColor: errorColor, textColor: Colors.white);
+        msg: "$e",
+        backgroundColor: errorColor,
+        textColor: Colors.white,
+      );
     }
   }
 
-// Get User Posts
+  // Get User Posts
   static Future<List<PostModel>> getUserPosts(String userId) async {
-    QuerySnapshot userPostsSnap = await postsRef
-        .doc(userId)
-        .collection('userPosts')
-        .orderBy('Timestamp', descending: true)
-        .get();
+    QuerySnapshot userPostsSnap =
+        await postsRef
+            .doc(userId)
+            .collection('userPosts')
+            .orderBy('Timestamp', descending: true)
+            .get();
     List<PostModel> userPosts =
         userPostsSnap.docs.map((doc) => PostModel.fromDoc(doc)).toList();
 
     return userPosts;
   }
 
-// Get Feeds
+  // Get Feeds
   static Future<List<FeedModel>> getFeeds(String userId) async {
     List<FeedModel> feed = [];
 
@@ -341,18 +375,23 @@ class DatabaseServices {
     QuerySnapshot followingSnapshot =
         await followingRef.doc(userId).collection("Following").get();
 
-    List<String> followingUsers = followingSnapshot.docs
-        .map((doc) => doc.id) // Assuming each document ID represents a user ID
-        .toList();
+    List<String> followingUsers =
+        followingSnapshot.docs
+            .map(
+              (doc) => doc.id,
+            ) // Assuming each document ID represents a user ID
+            .toList();
 
     // Retrieve the posts from the feed collections of the following users
     for (String followingUserId in followingUsers) {
       QuerySnapshot userFeedSnapshot =
           await feedsRef.doc(followingUserId).collection("Feeds").get();
-      List<FeedModel> userFeed = userFeedSnapshot.docs
-          .map(
-              (doc) => FeedModel.fromDoc(doc)) // Assuming you have a Post model
-          .toList();
+      List<FeedModel> userFeed =
+          userFeedSnapshot.docs
+              .map(
+                (doc) => FeedModel.fromDoc(doc),
+              ) // Assuming you have a Post model
+              .toList();
 
       feed.addAll(userFeed);
     }
@@ -363,29 +402,33 @@ class DatabaseServices {
     return feed;
   }
 
-// Get Links
+  // Get Links
   static Future<List<PostModel>> getLinks(String userId) async {
-    QuerySnapshot userPostsSnap = await postsRef
-        .doc(userId)
-        .collection('userPosts')
-        .orderBy('Timestamp', descending: true)
-        .get();
+    QuerySnapshot userPostsSnap =
+        await postsRef
+            .doc(userId)
+            .collection('userPosts')
+            .orderBy('Timestamp', descending: true)
+            .get();
     List<PostModel> userPosts =
         userPostsSnap.docs.map((doc) => PostModel.fromDoc(doc)).toList();
 
     return userPosts;
   }
 
-// Checking episode
+  // Checking episode
   static Future<List<PostModel>> checkingEpisode(
-      PostModel postModel, int series) async {
-    QuerySnapshot userPostsSnap = await postsRef
-        .doc(postModel.userId)
-        .collection('userPosts')
-        .doc(postModel.postuid)
-        .collection('otherEpisodes')
-        .where('episode', isNotEqualTo: series)
-        .get();
+    PostModel postModel,
+    int series,
+  ) async {
+    QuerySnapshot userPostsSnap =
+        await postsRef
+            .doc(postModel.userId)
+            .collection('userPosts')
+            .doc(postModel.postuid)
+            .collection('otherEpisodes')
+            .where('episode', isNotEqualTo: series)
+            .get();
     List<PostModel> userPosts =
         userPostsSnap.docs.map((doc) => PostModel.fromDoc(doc)).toList();
 
@@ -394,11 +437,12 @@ class DatabaseServices {
 
   // Get Following User Posts
   static Future<List<PostModel>> getFollowingPosts(String userId) async {
-    QuerySnapshot userPostsSnap = await followingPostsRef
-        .doc(userId)
-        .collection('posts')
-        .orderBy('Timestamp', descending: true)
-        .get();
+    QuerySnapshot userPostsSnap =
+        await followingPostsRef
+            .doc(userId)
+            .collection('posts')
+            .orderBy('Timestamp', descending: true)
+            .get();
     List<PostModel> userPosts =
         userPostsSnap.docs.map((doc) => PostModel.fromDoc(doc)).toList();
     userPosts.shuffle();
@@ -407,77 +451,60 @@ class DatabaseServices {
 
   // Get Other Series
   static Future<List<PostModel>> getOtherEpisodes(PostModel postModel) async {
-    QuerySnapshot userPostsSnap = await postsRef
-        .doc(postModel.userId)
-        .collection('userPosts')
-        .doc(postModel.postuid)
-        .collection('otherEpisode')
-        .orderBy("episode", descending: false)
-        .get();
+    QuerySnapshot userPostsSnap =
+        await postsRef
+            .doc(postModel.userId)
+            .collection('userPosts')
+            .doc(postModel.postuid)
+            .collection('otherEpisode')
+            .orderBy("episode", descending: false)
+            .get();
     List<PostModel> userPosts =
         userPostsSnap.docs.map((doc) => PostModel.fromDoc(doc)).toList();
 
     return userPosts;
   }
 
-// Get Series
-  static Future<List<SeriesModel>> getSeries(
-    PostModel postModel,
-  ) async {
-    QuerySnapshot userPostsSnap = await postsRef
-        .doc(postModel.userId)
-        .collection('userPosts')
-        .doc(postModel.postuid)
-        .collection('Series')
-        .orderBy("episode", descending: false)
-        .get();
+  // Get Series
+  static Future<List<SeriesModel>> getSeries(PostModel postModel) async {
+    QuerySnapshot userPostsSnap =
+        await postsRef
+            .doc(postModel.userId)
+            .collection('userPosts')
+            .doc(postModel.postuid)
+            .collection('Series')
+            .orderBy("episode", descending: false)
+            .get();
     List<SeriesModel> userPosts =
         userPostsSnap.docs.map((doc) => SeriesModel.fromDoc(doc)).toList();
 
     return userPosts;
   }
 
-  // Get Reccomended Post
-  static Future<List<PostModel>> getRecommendedPost() async {
+  static Future<List<PostModel>> getMovies() async {
     QuerySnapshot userPostsSnap =
-        await recommendedRef.orderBy("Timestamp", descending: true).get();
+        await moviesRef.orderBy("timestamp", descending: true).get();
     List<PostModel> userPosts =
         userPostsSnap.docs.map((doc) => PostModel.fromDoc(doc)).toList();
 
     return userPosts;
   }
 
-  // Get Explorer Post
-  static Future<List<PostModel>> getExplorerPost() async {
-    QuerySnapshot exploerePostSnap =
-        await newMoviesRef.orderBy("likes", descending: true).get();
+  static Future<List<PostModel>> getPopularMovies() async {
+    QuerySnapshot userPostsSnap =
+        await moviesRef
+            .orderBy('popularity', descending: true)
+            .limit(10) // top 10 popular movies
+            .get();
     List<PostModel> userPosts =
-        exploerePostSnap.docs.map((doc) => PostModel.fromDoc(doc)).toList();
+        userPostsSnap.docs.map((doc) => PostModel.fromDoc(doc)).toList();
 
     return userPosts;
   }
 
-  // Get Animes
-  static Future<List<PostModel>> getAnimes() async {
-    QuerySnapshot x =
-        await newMoviesRef.where("type", isEqualTo: "Anime").get();
-    List<PostModel> y = x.docs.map((doc) => PostModel.fromDoc(doc)).toList();
-    y.shuffle();
-    return y;
-  }
-
-  // Get Animations
-  static Future<List<PostModel>> getAnimations() async {
-    QuerySnapshot x =
-        await newMoviesRef.where("type", isEqualTo: "Animation").get();
-    List<PostModel> y = x.docs.map((doc) => PostModel.fromDoc(doc)).toList();
-    y.shuffle();
-    return y;
-  }
-
   // Get Explorer Post with Randomly
   static Future<List<PostModel>> getExplorerPostWithRandomly() async {
-    QuerySnapshot exploerePostSnap = await newMoviesRef.get();
+    QuerySnapshot exploerePostSnap = await moviesRef.get();
     List<PostModel> userPosts =
         exploerePostSnap.docs.map((doc) => PostModel.fromDoc(doc)).toList();
 
@@ -487,81 +514,103 @@ class DatabaseServices {
     return userPosts;
   }
 
-// Get Drama's
+  // Get Drama's
   static Future<List<PostModel>> getDramas() async {
     QuerySnapshot exploerePostSnap =
-        await newMoviesRef.orderBy("Timestamp", descending: true).get();
+        await moviesRef.orderBy("Timestamp", descending: true).get();
     List<PostModel> userPosts =
         exploerePostSnap.docs.map((doc) => PostModel.fromDoc(doc)).toList();
     userPosts.shuffle();
     return userPosts;
   }
 
-// like post
-  static void likePost(String postuid, String userId, String likedByUserid,
-      String thumbnail, bool isFeed) async {
+  // like post
+  static void likePost(
+    String postuid,
+    String userId,
+    String likedByUserid,
+    String thumbnail,
+    bool isFeed,
+  ) async {
     try {
-      await likesRef
-          .doc(postuid)
-          .collection('Likes')
-          .doc(likedByUserid)
-          .set({'Timestamp': Timestamp.now()});
+      await likesRef.doc(postuid).collection('Likes').doc(likedByUserid).set({
+        'Timestamp': Timestamp.now(),
+      });
       await postsRef
           .doc(userId)
           .collection('userPosts')
           .doc(postuid)
-          .update({'likes': FieldValue.increment(1)}).then((value) =>
-              newMoviesRef
-                  .doc(postuid)
-                  .update({'likes': FieldValue.increment(1)}).then((value) =>
-                      recommendedRef
-                          .doc(postuid)
-                          .update({'likes': FieldValue.increment(1)})));
+          .update({'likes': FieldValue.increment(1)})
+          .then(
+            (value) => moviesRef
+                .doc(postuid)
+                .update({'likes': FieldValue.increment(1)})
+                .then(
+                  (value) => moviesRef.doc(postuid).update({
+                    'likes': FieldValue.increment(1),
+                  }),
+                ),
+          );
     } catch (e) {
       print(e);
     }
 
     if (isFeed) {
       addActivity(
-          userId, likedByUserid, postuid, false, true, thumbnail, isFeed);
-      await feedsRef
-          .doc(userId)
-          .collection('Feeds')
-          .doc(postuid)
-          .update({'likes': FieldValue.increment(1)});
+        userId,
+        likedByUserid,
+        postuid,
+        false,
+        true,
+        thumbnail,
+        isFeed,
+      );
+      await feedsRef.doc(userId).collection('Feeds').doc(postuid).update({
+        'likes': FieldValue.increment(1),
+      });
     } else {
       addActivity(
-          userId, likedByUserid, postuid, false, true, thumbnail, isFeed);
+        userId,
+        likedByUserid,
+        postuid,
+        false,
+        true,
+        thumbnail,
+        isFeed,
+      );
     }
   }
 
-// unloike post
-  static void unlikePost(String postuid, String userId, String likedByUserid,
-      String activityUuid, bool isFeed) async {
+  // unloike post
+  static void unlikePost(
+    String postuid,
+    String userId,
+    String likedByUserid,
+    String activityUuid,
+    bool isFeed,
+  ) async {
     await likesRef.doc(postuid).collection('Likes').doc(likedByUserid).delete();
     if (isFeed) {
     } else {
-      await postsRef
-          .doc(userId)
-          .collection('userPosts')
-          .doc(postuid)
-          .update({'likes': FieldValue.increment(-1)});
+      await postsRef.doc(userId).collection('userPosts').doc(postuid).update({
+        'likes': FieldValue.increment(-1),
+      });
     }
 
     try {
       if (isFeed) {
-        await feedsRef
-            .doc(userId)
-            .collection('Feeds')
-            .doc(postuid)
-            .update({'likes': FieldValue.increment(-1)});
+        await feedsRef.doc(userId).collection('Feeds').doc(postuid).update({
+          'likes': FieldValue.increment(-1),
+        });
       } else {
-        await newMoviesRef
+        await moviesRef
             .doc(postuid)
-            .update({'likes': FieldValue.increment(-1)}).then((value) =>
-                recommendedRef
-                    .doc(postuid)
-                    .update({'likes': FieldValue.increment(-1)}));
+            .update({'likes': FieldValue.increment(-1)})
+            .then(
+              (value) => moviesRef.doc(postuid).update({
+                'likes': FieldValue.increment(-1),
+              }),
+            );
       }
     } catch (e) {
       print(e);
@@ -569,49 +618,52 @@ class DatabaseServices {
     removeActivity(userId, likedByUserid, activityUuid, false, true);
   }
 
-// is Liked
-  static Future<bool> isLikedPost(
-    String postId,
-    String currentUserId,
-  ) async {
+  // is Liked
+  static Future<bool> isLikedPost(String postId, String currentUserId) async {
     DocumentSnapshot likedDoc =
         await likesRef.doc(postId).collection('Likes').doc(currentUserId).get();
     return likedDoc.exists;
   }
 
-// reefeed
-  static void reefeed(String postuid, String userId, String refeedByUserid,
-      String picture, bool isFeed) async {
+  // reefeed
+  static void reefeed(
+    String postuid,
+    String userId,
+    String refeedByUserid,
+    String picture,
+    bool isFeed,
+  ) async {
     try {
       await reefeedsRef
           .doc(postuid)
           .collection('Reefeeds')
           .doc(refeedByUserid)
           .set({'Timestamp': Timestamp.now()});
-      await feedsRef
-          .doc(userId)
-          .collection('Feeds')
-          .doc(postuid)
-          .update({'refeed': FieldValue.increment(1)});
+      await feedsRef.doc(userId).collection('Feeds').doc(postuid).update({
+        'refeed': FieldValue.increment(1),
+      });
     } catch (e) {
       print(e);
     }
   }
 
-// unreefeed
-  static void unreefeed(String postuid, String userId, String refeedByUserid,
-      String picture, bool isFeed) async {
+  // unreefeed
+  static void unreefeed(
+    String postuid,
+    String userId,
+    String refeedByUserid,
+    String picture,
+    bool isFeed,
+  ) async {
     try {
       await reefeedsRef
           .doc(postuid)
           .collection('Reefeeds')
           .doc(refeedByUserid)
           .delete();
-      await feedsRef
-          .doc(userId)
-          .collection('Feeds')
-          .doc(postuid)
-          .update({'refeed': FieldValue.increment(-1)});
+      await feedsRef.doc(userId).collection('Feeds').doc(postuid).update({
+        'refeed': FieldValue.increment(-1),
+      });
     } catch (e) {
       print(e);
     }
@@ -624,40 +676,38 @@ class DatabaseServices {
   }
 
   // isReefeded
-  static Future<bool> isReefeded(
-    String postId,
-    String currentUserId,
-  ) async {
-    DocumentSnapshot reededDoc = await reefeedsRef
-        .doc(postId)
-        .collection('Reefeeds')
-        .doc(currentUserId)
-        .get();
+  static Future<bool> isReefeded(String postId, String currentUserId) async {
+    DocumentSnapshot reededDoc =
+        await reefeedsRef
+            .doc(postId)
+            .collection('Reefeeds')
+            .doc(currentUserId)
+            .get();
     return reededDoc.exists;
   }
 
-// is User Created Chat Collection
+  // is User Created Chat Collection
   static Future<bool> isCollectionCreated(
     String currentUserId,
     String visistedUserId,
   ) async {
-    DocumentSnapshot createdDoc = await addchatsRef
-        .doc(currentUserId)
-        .collection('Add')
-        .doc(visistedUserId)
-        .get();
+    DocumentSnapshot createdDoc =
+        await addchatsRef
+            .doc(currentUserId)
+            .collection('Add')
+            .doc(visistedUserId)
+            .get();
     return createdDoc.exists;
   }
 
-// Get Collection Chats
-  static Future<List<ChatModel>> getCollectionChats(
-    String userid,
-  ) async {
-    QuerySnapshot usersSnap = await addchatsRef
-        .doc(userid)
-        .collection('Add')
-        .orderBy('lastMessage Timestamp', descending: true)
-        .get();
+  // Get Collection Chats
+  static Future<List<ChatModel>> getCollectionChats(String userid) async {
+    QuerySnapshot usersSnap =
+        await addchatsRef
+            .doc(userid)
+            .collection('Add')
+            .orderBy('lastMessage Timestamp', descending: true)
+            .get();
 
     List<ChatModel> users =
         usersSnap.docs.map((doc) => ChatModel.fromDoc(doc)).toList();
@@ -665,25 +715,20 @@ class DatabaseServices {
   }
 
   // is Sent Request
-  static Future<bool> isSentRequest(
-    String currentUserId,
-  ) async {
+  static Future<bool> isSentRequest(String currentUserId) async {
     DocumentSnapshot likedDoc = await requestsRef.doc(currentUserId).get();
     return likedDoc.exists;
   }
 
-// get likes
+  // get likes
   static Future<int> getPostLikes(postId) async {
     QuerySnapshot likesSnapshot =
         await likesRef.doc(postId).collection('Likes').get();
     return likesSnapshot.docs.length;
   }
 
-// CreateCollection Message
-  static void createCollection(
-    String currentUserId,
-    String visitedUserId,
-  ) {
+  // CreateCollection Message
+  static void createCollection(String currentUserId, String visitedUserId) {
     addchatsRef
         .doc(currentUserId)
         .collection('Add')
@@ -695,21 +740,23 @@ class DatabaseServices {
           'lastMessage text': '',
           'lastSeen': Timestamp.now(),
           'Typechat': 'Tap to chat',
-          "isRead": false
+          "isRead": false,
         })
-        .then((value) => addchatsRef
-                .doc(visitedUserId)
-                .collection('Add')
-                .doc(currentUserId)
-                .set({
-              'visitedUserId': currentUserId,
-              'added User at ': Timestamp.now(),
-              'lastMessage Timestamp': Timestamp.now(),
-              'lastMessage text': '',
-              'lastSeen': Timestamp.now(),
-              'Typechat': 'Tap to chat',
-              "isRead": false,
-            }))
+        .then(
+          (value) => addchatsRef
+              .doc(visitedUserId)
+              .collection('Add')
+              .doc(currentUserId)
+              .set({
+                'visitedUserId': currentUserId,
+                'added User at ': Timestamp.now(),
+                'lastMessage Timestamp': Timestamp.now(),
+                'lastMessage text': '',
+                'lastSeen': Timestamp.now(),
+                'Typechat': 'Tap to chat',
+                "isRead": false,
+              }),
+        )
         .then((value) => print("Created Chat Collaction"));
   }
 
@@ -719,43 +766,42 @@ class DatabaseServices {
         .collection('Add')
         .doc(visitedUserId)
         .delete()
-        .then((value) => addchatsRef
-            .doc(visitedUserId)
-            .collection('Add')
-            .doc(currentUserId)
-            .delete());
+        .then(
+          (value) =>
+              addchatsRef
+                  .doc(visitedUserId)
+                  .collection('Add')
+                  .doc(currentUserId)
+                  .delete(),
+        );
   }
 
   // SearchUsers
-  static Future<QuerySnapshot> searchUsers(
-    String username,
-  ) async {
-    Future<QuerySnapshot> users = usersRef
-        .where('username', isGreaterThanOrEqualTo: username)
-        .where('username', isLessThan: '${username}z')
-        .get();
+  static Future<QuerySnapshot> searchUsers(String username) async {
+    Future<QuerySnapshot> users =
+        usersRef
+            .where('username', isGreaterThanOrEqualTo: username)
+            .where('username', isLessThan: '${username}z')
+            .get();
 
     return users;
   }
 
   // Search posts
-  static Future<QuerySnapshot> searchPosts(
-    String title,
-  ) async {
-    Future<QuerySnapshot> posts = newMoviesRef
-        .where('title', isGreaterThanOrEqualTo: title)
-        .where('title', isLessThan: '${title}z')
-        .get();
+  static Future<QuerySnapshot> searchPosts(String title) async {
+    Future<QuerySnapshot> posts =
+        moviesRef
+            .where('title', isGreaterThanOrEqualTo: title)
+            .where('title', isLessThan: '${title}z')
+            .get();
 
     return posts;
   }
 
-// Search posts by tags
-  static Future<QuerySnapshot> searchPostsbyTags(
-    String tag,
-  ) async {
+  // Search posts by tags
+  static Future<QuerySnapshot> searchPostsbyTags(String tag) async {
     Future<QuerySnapshot> posts =
-        newMoviesRef.where('tags', arrayContains: tag).get();
+        moviesRef.where('tags', arrayContains: tag).get();
 
     return posts;
   }
@@ -771,27 +817,41 @@ class DatabaseServices {
         .collection('Following')
         .doc(visitedUserId)
         .set({
-      'visitedUserId': visitedUserId,
-      'followedUser at ': Timestamp.now(),
-      'lastMessage Timestamp': Timestamp.now(),
-      'lastMessage text': ''
-    });
+          'visitedUserId': visitedUserId,
+          'followedUser at ': Timestamp.now(),
+          'lastMessage Timestamp': Timestamp.now(),
+          'lastMessage text': '',
+        });
     followersRef
         .doc(visitedUserId)
         .collection('Followers')
         .doc(currentUserId)
         .set({
-      'visitedUserId': visitedUserId,
-      'followedUser at ': Timestamp.now(),
-      'lastMessage Timestamp': Timestamp.now(),
-    });
+          'visitedUserId': visitedUserId,
+          'followedUser at ': Timestamp.now(),
+          'lastMessage Timestamp': Timestamp.now(),
+        });
 
     addActivity(
-        visitedUserId, currentUserId, activityID, true, false, '', false);
+      visitedUserId,
+      currentUserId,
+      activityID,
+      true,
+      false,
+      '',
+      false,
+    );
   }
 
-  static void addActivity(String visitedUserId, String currentUserId,
-      String postId, follow, islikedPost, String thumbnail, bool isFeed) async {
+  static void addActivity(
+    String visitedUserId,
+    String currentUserId,
+    String postId,
+    follow,
+    islikedPost,
+    String thumbnail,
+    bool isFeed,
+  ) async {
     if (currentUserId != visitedUserId) {
       if (follow) {
         await activityRef
@@ -799,33 +859,38 @@ class DatabaseServices {
             .collection('activity')
             .doc(currentUserId)
             .set({
-          'Timestamp': Timestamp.now(),
-          'ActivityType': 'following',
-          'activityMessage': 'دوای تۆ کەوت',
-          'byUserId': currentUserId,
-          'thumbnail': ''
-        });
+              'Timestamp': Timestamp.now(),
+              'ActivityType': 'following',
+              'activityMessage': 'دوای تۆ کەوت',
+              'byUserId': currentUserId,
+              'thumbnail': '',
+            });
       } else if (islikedPost) {
         await activityRef
             .doc(visitedUserId)
             .collection('activity')
             .doc(postId)
             .set({
-          'Timestamp': Timestamp.now(),
-          'ActivityType': 'liked post',
-          'activityMessage':
-              isFeed ? "فییدەکەتی بەدڵبوو" : 'پۆستەکەتی بەدڵ بوو',
-          'byUserId': currentUserId,
-          'thumbnail': thumbnail,
-        });
+              'Timestamp': Timestamp.now(),
+              'ActivityType': 'liked post',
+              'activityMessage':
+                  isFeed ? "فییدەکەتی بەدڵبوو" : 'پۆستەکەتی بەدڵ بوو',
+              'byUserId': currentUserId,
+              'thumbnail': thumbnail,
+            });
       }
     } else {
       print('object');
     }
   }
 
-  static void removeActivity(String visitedUserId, String currentUserId,
-      String postId, unfollow, likedPost) async {
+  static void removeActivity(
+    String visitedUserId,
+    String currentUserId,
+    String postId,
+    unfollow,
+    likedPost,
+  ) async {
     if (unfollow) {
       await activityRef
           .doc(visitedUserId)
@@ -844,32 +909,34 @@ class DatabaseServices {
 
   // Get History
   static Future<List<HistoryModel>> getHistoryViews(String userId) async {
-    QuerySnapshot userActivitySnap = await historyViews
-        .doc(userId)
-        .collection('Viewed')
-        .orderBy('Timestamp', descending: true)
-        .get();
+    QuerySnapshot userActivitySnap =
+        await historyViews
+            .doc(userId)
+            .collection('Viewed')
+            .orderBy('Timestamp', descending: true)
+            .get();
     List<HistoryModel> userViewd =
         userActivitySnap.docs.map((doc) => HistoryModel.fromDoc(doc)).toList();
 
     return userViewd;
   }
 
-// Get Activity
+  // Get Activity
   static Future<List<ActivityModel>> getActivities(String userId) async {
-    QuerySnapshot userActivitySnap = await activityRef
-        .doc(userId)
-        .collection('activity')
-        .orderBy('Timestamp', descending: true)
-        .limit(25)
-        .get();
+    QuerySnapshot userActivitySnap =
+        await activityRef
+            .doc(userId)
+            .collection('activity')
+            .orderBy('Timestamp', descending: true)
+            .limit(25)
+            .get();
     List<ActivityModel> userActivity =
         userActivitySnap.docs.map((doc) => ActivityModel.fromDoc(doc)).toList();
     print(userActivity.length);
     return userActivity;
   }
 
-// Unfollow User
+  // Unfollow User
   static void unFollowUser(
     String currentUserId,
     String visitedUserId,
@@ -881,10 +948,10 @@ class DatabaseServices {
         .doc(visitedUserId)
         .get()
         .then((doc) {
-      if (doc.exists) {
-        doc.reference.delete();
-      }
-    });
+          if (doc.exists) {
+            doc.reference.delete();
+          }
+        });
 
     await followersRef
         .doc(visitedUserId)
@@ -892,59 +959,71 @@ class DatabaseServices {
         .doc(currentUserId)
         .get()
         .then((doc) {
-      if (doc.exists) {
-        doc.reference.delete();
-      }
-    });
+          if (doc.exists) {
+            doc.reference.delete();
+          }
+        });
     removeActivity(visitedUserId, currentUserId, activityID, true, false);
     removeCollection(currentUserId, visitedUserId);
   }
 
   // Is Following User
   static Future<bool> isFollowingUser(
-      String currentUserId, String visitedUserId) async {
-    DocumentSnapshot followingDoc = await followersRef
-        .doc(visitedUserId)
-        .collection('Followers')
-        .doc(currentUserId)
-        .get();
+    String currentUserId,
+    String visitedUserId,
+  ) async {
+    DocumentSnapshot followingDoc =
+        await followersRef
+            .doc(visitedUserId)
+            .collection('Followers')
+            .doc(currentUserId)
+            .get();
     return followingDoc.exists;
   }
 
   // is Blocking User
   static Future<bool> isBlockingUser(
-      String currentUserId, String visitedUserId) async {
-    DocumentSnapshot blockingDoc = await blockedRef
-        .doc(currentUserId)
-        .collection('Block')
-        .doc(visitedUserId)
-        .get();
+    String currentUserId,
+    String visitedUserId,
+  ) async {
+    DocumentSnapshot blockingDoc =
+        await blockedRef
+            .doc(currentUserId)
+            .collection('Block')
+            .doc(visitedUserId)
+            .get();
     return blockingDoc.exists;
   }
 
-// isMeBlocked
+  // isMeBlocked
   static Future<bool> isMeBlocked(
-      String currentUserId, String visitedUserId) async {
-    DocumentSnapshot blockingDoc = await blockedRef
-        .doc(visitedUserId)
-        .collection('Block')
-        .doc(currentUserId)
-        .get();
+    String currentUserId,
+    String visitedUserId,
+  ) async {
+    DocumentSnapshot blockingDoc =
+        await blockedRef
+            .doc(visitedUserId)
+            .collection('Block')
+            .doc(currentUserId)
+            .get();
     return blockingDoc.exists;
   }
 
   // Is DarkMode User
   static Future<bool> isDarkMode(
-      String currentUserId, String visitedUserId) async {
-    DocumentSnapshot followingDoc = await addchatsRef
-        .doc(currentUserId)
-        .collection('Add')
-        .doc(visitedUserId)
-        .get();
+    String currentUserId,
+    String visitedUserId,
+  ) async {
+    DocumentSnapshot followingDoc =
+        await addchatsRef
+            .doc(currentUserId)
+            .collection('Add')
+            .doc(visitedUserId)
+            .get();
     return followingDoc.exists;
   }
 
-// Followers Number
+  // Followers Number
   static Future<int> followersNumber(String userId) async {
     QuerySnapshot followersSnapshot =
         await followersRef.doc(userId).collection('Followers').get();
@@ -958,23 +1037,29 @@ class DatabaseServices {
     return followingSnapshot.docs.length;
   }
 
-// Block User
+  // Block User
   static void blockUser(
-      String currentUserId, String visitedUserId, String activityID) async {
+    String currentUserId,
+    String visitedUserId,
+    String activityID,
+  ) async {
     await blockedRef
         .doc(currentUserId)
         .collection('Block')
         .doc(visitedUserId)
         .set({
-      'Timestamp': Timestamp.now(),
-      'BlockedUser': visitedUserId,
-      'BlockerUser': currentUserId
-    }).then((value) => followingPostsRef
-            .doc(currentUserId)
-            .collection('post')
-            .doc(visitedUserId)
-            .delete()
-            .whenComplete(() => print("You blocked: $visitedUserId")));
+          'Timestamp': Timestamp.now(),
+          'BlockedUser': visitedUserId,
+          'BlockerUser': currentUserId,
+        })
+        .then(
+          (value) => followingPostsRef
+              .doc(currentUserId)
+              .collection('post')
+              .doc(visitedUserId)
+              .delete()
+              .whenComplete(() => print("You blocked: $visitedUserId")),
+        );
 
     // Remove From Addchats
     removeCollection(currentUserId, visitedUserId);
@@ -987,11 +1072,11 @@ class DatabaseServices {
         .doc(currentUserId)
         .get()
         .then((doc) {
-      if (doc.exists) {
-        doc.reference.delete();
-      }
-      print('Removed you from following him');
-    });
+          if (doc.exists) {
+            doc.reference.delete();
+          }
+          print('Removed you from following him');
+        });
   }
 
   // Unblock User
@@ -1018,10 +1103,11 @@ class DatabaseServices {
     print("BuildNumber: ${packageInfo.buildNumber}");
     // Check From Firestore
     var versionFromServer = '';
-    DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
-        .collection('AppVersion')
-        .doc('Android')
-        .get();
+    DocumentSnapshot documentSnapshot =
+        await FirebaseFirestore.instance
+            .collection('AppVersion')
+            .doc('Android')
+            .get();
     versionFromServer = documentSnapshot["version"];
 
     print("Version From Server: $versionFromServer");

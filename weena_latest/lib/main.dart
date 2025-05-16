@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:unity_ads_plugin/unity_ads_plugin.dart';
+import 'package:weena_latest/APi/apis.dart';
 import 'package:weena_latest/Constant/constant.dart';
 import 'package:weena_latest/LocalString.dart';
 import 'package:weena_latest/Screens/Welcome/welcome.dart';
@@ -30,13 +31,12 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  var id;
   static Widget getScreenId() {
     return StreamBuilder(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.active) {
-          User? user = snapshot.data as User?;
+          User? user = snapshot.data;
           if (user != null) {
             return Feed(currentUserId: user.uid);
           } else {

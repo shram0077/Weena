@@ -51,7 +51,7 @@ class _CardViewState extends State<HistoryCardView> {
 
           UserModell userModel = UserModell.fromDoc(snapshot.data);
           return FutureBuilder(
-              future: newMoviesRef.doc(widget.historyModel.postuid).get(),
+              future: moviesRef.doc(widget.historyModel.postuid).get(),
               builder: (BuildContext context, AsyncSnapshot snapshot) {
                 if (!snapshot.hasData) {
                   return Center(child: CircleProgressIndicator());

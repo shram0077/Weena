@@ -187,29 +187,12 @@ class _ProfileScreensState extends State<ProfileScreen> {
     );
   }
 
-  String admIMG =
-      "https://firebasestorage.googleapis.com/v0/b/the-movies-and-drama.appspot.com/o/coverPicture%2FcoverPicture%2Fusers%2FuserCover_O0vj0b7RaYUi2UU4wAZ9ITqmWFE3.jpg?alt=media&token=e2090664-befa-474e-9344-898aa2405e74";
-  String onClickLink = "https://www.weena.app";
-  void fetchAds() async {
-    QuerySnapshot collection =
-        await FirebaseFirestore.instance.collection('Ads').get();
-    var random = Random().nextInt(collection.docs.length);
-    DocumentSnapshot randomDoc = collection.docs[random];
-    setState(() {
-      admIMG = randomDoc["image"];
-      onClickLink = randomDoc["oneClickLink"];
-    });
-  }
-
   @override
   void initState() {
     DatabaseServices.checkVersion(context);
 
-    fetchAds();
     super.initState();
-    Timer.periodic(Duration(seconds: 5), (timer) {
-      fetchAds();
-    });
+    Timer.periodic(Duration(seconds: 5), (timer) {});
     if (widget.userModel.coverPicture.isNotEmpty) {
       _genrateColors();
     } else {}
@@ -682,9 +665,7 @@ class _ProfileScreensState extends State<ProfileScreen> {
                                 color: appBarColor.withOpacity(0.7),
                                 image: DecorationImage(
                                   fit: BoxFit.cover,
-                                  image:
-                                  
-                                   CachedNetworkImageProvider(
+                                  image: CachedNetworkImageProvider(
                                     MyEncriptionDecription.decryptWithAESKey(
                                       widget.userModel.coverPicture,
                                     ),
@@ -1013,22 +994,6 @@ class _ProfileScreensState extends State<ProfileScreen> {
                                         userModel,
                                       ),
                             ),
-                        _movie.length > 5
-                            ? Center(
-                              child: text(
-                                "ڕیکلام",
-                                shadowColor,
-                                13,
-                                FontWeight.normal,
-                                TextDirection.rtl,
-                              ),
-                            )
-                            : SizedBox(),
-                        _movie.length > 5
-                            ? admIMG != null
-                                ? buildAds(admIMG, onClickLink)
-                                : SizedBox()
-                            : SizedBox(),
                       ],
                     ),
                   ),
